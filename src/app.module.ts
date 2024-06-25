@@ -1,15 +1,38 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
+import { ColumnsModule } from './columns/columns.module';
+import { TasksModule } from './tasks/tasks.module';
+import { ProjectsModule } from './projects/projects.module';
+import { User } from './users/user.model';
+import { Project } from './projects/project.model';
+import { Task } from './tasks/task.model';
+import { RolesModule } from './roles/roles.module';
+import { Role } from './roles/roles.model';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.${process.env.NODE_ENV}.env`
-    })
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.POSTGRES_HOST,
+      port: +process.env.POSTGRES_PORT,
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DB,
+      entities: [User, Project, Task, Role],
+      synchronize: true,
+    }),
+    AuthModule,
+    UsersModule,
+    ColumnsModule,
+    TasksModule,
+    ProjectsModule,
+    RolesModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
