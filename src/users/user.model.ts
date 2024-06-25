@@ -1,7 +1,7 @@
 import { Exclude } from "class-transformer";
 import { Project } from "src/projects/project.model";
 import { Role } from "src/roles/roles.model";
-import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'users'})
 export class User {
@@ -22,5 +22,6 @@ export class User {
     projects: Project[]
 
     @ManyToMany(type => Role, role => role.users)
+    @JoinTable()
     roles: Role[]    
 }
