@@ -1,4 +1,3 @@
-import { Exclude } from "class-transformer";
 import { Project } from "src/projects/project.model";
 import { Role } from "src/roles/roles.model";
 import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
@@ -8,10 +7,9 @@ export class User {
     @PrimaryGeneratedColumn('uuid')
     id: string
 
-    @Column('varchar')
+    @Column({type: 'varchar', unique: true})
     email: string
 
-    @Exclude()
     @Column({type: 'bytea', name: 'pass_hash'})
     password: string
 
@@ -21,7 +19,7 @@ export class User {
     @OneToMany(type => Project, project => project.user)
     projects: Project[]
 
-    @ManyToMany(type => Role, role => role.users)
+    @ManyToMany(type => Role, role => role.users, {onDelete: 'CASCADE'})
     @JoinTable()
     roles: Role[]    
 }

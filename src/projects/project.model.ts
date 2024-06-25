@@ -7,7 +7,7 @@ export class Project {
     @PrimaryGeneratedColumn('uuid')
     id: string
 
-    @OneToMany(type => Task, task => task.project)
+    @OneToMany(type => Task, task => task.project, {onDelete: 'CASCADE'})
     tasks: Task[]
 
     @ManyToOne(type => User, user => user.projects)

@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.model';
 import { RolesService } from 'src/roles/roles.service';
 import { Role } from 'src/roles/roles.model';
+import * as bcryptjs from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
@@ -12,35 +13,39 @@ export class UsersService {
                 private roleService: RolesService) {}
 
     async createUser(dto: CreateUserDto) {
-        const potentilUser = await this.findUserByEmail(dto.email);
-        if (potentilUser) {
+        const potentialUser = await this.findUserByEmail(dto.email);
+        if (potentialUser) {
             throw new HttpException('User already exists', HttpStatus.CONFLICT);
         }
         
         let roles: Role[] = [];
         
-        if (!dto.roles || dto.roles.length === 0) {
-            const role = await this.roleService.getRoleByValue('user');
-            roles.push(role);
-        } else {
-            for (const value of dto.roles) {
-                const role = await this.roleService.getRoleByValue(value);
-                if (role) {
-                    roles.push(role);
-                }
+        for (const roleValue of dto.roles) {
+            const role = await this.roleService.getRoleByValue(roleValue);
+            if (role) {
+                roles.push(role);
             }
         }
 
+        if (roles.length === 0) {
+            const defaultRole = await this.roleService.getRoleByValue('user');
+            roles.push(defaultRole);
+        }
+
+        let passHash = await bcryptjs.hash(dto.password, 5);
+
         const user = this.userRepo.create({
             ...dto,
-            roles
+            roles: roles,
+            password: passHash
         });
 
-        return await this.userRepo.save(user);
+        await this.userRepo.save(user);
+        return user;
     }
 
-    async findUserByEmail(email: string) {
-        const user = await this.userRepo.findOneBy({email});
+    async findUserByEmail(email: string): Promise<User> {
+        const user = await this.userRepo.findOne({where: {email}});
         return user;
     }
 }

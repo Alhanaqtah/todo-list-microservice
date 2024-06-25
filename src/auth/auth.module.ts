@@ -7,6 +7,13 @@ import { UsersModule } from 'src/users/users.module';
 @Module({
   controllers: [AuthController],
   providers: [AuthService],
-  imports: [UsersModule, JwtModule],
+  imports: [
+    UsersModule,
+    JwtModule.register({
+      global: true,
+      secret: process.env.SECRET_KEY || 'SECRET-KEY',
+      signOptions: {expiresIn: '15m'},
+    })
+  ],
 })
 export class AuthModule {}
