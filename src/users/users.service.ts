@@ -41,6 +41,9 @@ export class UsersService {
         });
 
         await this.userRepo.save(user);
+
+        delete user.password;
+
         return user;
     }
 
