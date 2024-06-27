@@ -13,28 +13,33 @@ export class RolesGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         try {
             const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [context.getHandler(), context.getClass()]);
-
             if (!requiredRoles) {
                 return true;
             }
-
+        
             const req = context.switchToHttp().getRequest();
             const auth = req.headers.authorization;
-
+            if (!auth) {
+                throw new UnauthorizedException({ message: 'Authorization header missing' });
+            }
+        
             const bearer = auth.split(' ')[0];
             const token = auth.split(' ')[1];
-
+        
             if (bearer !== 'Bearer' || !token) {
-                throw new UnauthorizedException({message: 'Failed to get resource'});
+                throw new UnauthorizedException({ message: 'Invalid token format' });
             }
-
+        
             const user = this.jwtService.verify(token);
-
+            if (!user || !user.sub) {
+                throw new UnauthorizedException({ message: 'Invalid token payload' });
+            }
+        
             req.user = user;
-
-            return user.roles.some(role => requiredRoles.includes(role.value));
-        } catch(error) {
-            throw new HttpException('Canceled for access', HttpStatus.FORBIDDEN);
+        
+            return user.roles.some(role => requiredRoles.includes(role));
+        } catch (error) {
+            throw new HttpException('Access denied', HttpStatus.FORBIDDEN);
         }
     }
 }

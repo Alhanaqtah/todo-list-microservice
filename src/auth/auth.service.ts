@@ -23,15 +23,11 @@ export class AuthService {
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
-        console.log('User found:', user);
-        console.log('Password type:', typeof user.password);
-        console.log('Password value:', user.password);
-
         const match = await bcryptjs.compare(userDto.password, String(user.password));
         if (!match) {
             throw new HttpException('Invalid credentials', HttpStatus.FORBIDDEN);
         }
-
+ 
         const token = this.generateToken(user);
 
         return token;
@@ -41,7 +37,7 @@ export class AuthService {
         return {
             token: this.jwtService.sign({
                 sub: user.id,
-                roles: user.roles
+                roles: user.roles.map(role => role.value)
             })
         }
     }
