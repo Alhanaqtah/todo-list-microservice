@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Delete, Body, Req, UseGuards, Param } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Body, Req, UseGuards, Param, Inject } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { RolesGuard } from 'src/auth/roles.guard';
@@ -14,22 +14,24 @@ export class ProjectsController {
     @Roles('user', 'admin')
     @Post()
     async create(@Req() req: any, @Body() projectDto: CreateProjectDto) {
-        return this.projectService.create(req.user, projectDto);
+        return await this.projectService.create(req.user, projectDto);
     }
 
     @UseGuards(OwnerGuard)
     @Get()
-    async read(@Body() projectId: ProjectIdDto) {
+    async read(@Req() req: any, @Body() projectId: ProjectIdDto) {
         return await this.projectService.find(projectId.id);
     }
 
+    // @UseGuards(OwnerGuard)
     // @Put()
-    // update() {
-
+    // async update(@Body() projectDto: CreateProjectDto) {
+    //     return await this.projectService.update(projectDto);
     // }
 
+    // @UseGuards(OwnerGuard)
     // @Delete()
-    // delete() {
+    // async delete() {
 
     // }
 }

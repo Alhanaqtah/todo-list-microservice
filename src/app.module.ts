@@ -38,6 +38,6 @@ import { Col } from './columns/column.model';
     ProjectsModule,
     RolesModule,
     ListsModule
-  ],
+  ]
 })
 export class AppModule {}

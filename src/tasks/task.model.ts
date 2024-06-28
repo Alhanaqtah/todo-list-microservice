@@ -7,5 +7,5 @@ export class Task {
     id: string
 
     @ManyToOne(type => Col, column => column.tasks)
-    column: Col[]
+    column: Col
 }
