@@ -3,7 +3,6 @@ import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
-import { ProjectIdDto } from './dto/project-id.dto';
 import { OwnerGuard } from 'src/auth/owner.guard';
 
 @UseGuards(RolesGuard)
@@ -19,15 +18,17 @@ export class ProjectsController {
 
     @UseGuards(OwnerGuard)
     @Get()
-    async read(@Req() req: any, @Body() projectId: ProjectIdDto) {
-        return await this.projectService.find(projectId.id);
+    async read(@Req() req: any) {
+        const projectId = req.resourceId;
+        return await this.projectService.find(projectId);
     }
 
-    // @UseGuards(OwnerGuard)
-    // @Put()
-    // async update(@Body() projectDto: CreateProjectDto) {
-    //     return await this.projectService.update(projectDto);
-    // }
+    @UseGuards(OwnerGuard)
+    @Put()
+    async update(@Req() req: any, @Body() projectDto: CreateProjectDto) {
+        const projectId = req.resourceId;
+        return await this.projectService.update(projectId, projectDto);
+    }
 
     // @UseGuards(OwnerGuard)
     // @Delete()

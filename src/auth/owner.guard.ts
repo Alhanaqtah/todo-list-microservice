@@ -20,42 +20,39 @@ export class OwnerGuard implements CanActivate {
     private projectRepository: Repository<Project>,
     @InjectRepository(Col)
     private columnRepository: Repository<Col>,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    
-    try {
-      const resourceId = this.getResourceId(request);
-      const resourceType = this.getResourceType(request.url);
-      const token = this.getToken(request);
-      const user = this.verifyToken(token);
 
-      request.user = user;
+    const resourceId = this.getResourceId(request);
+    const resourceType = this.getResourceType(request.url);
+    const token = this.getToken(request);
+    const user = this.verifyToken(token);
 
-      const resource = await this.getResource(resourceType, resourceId);
-      
-      if (!resource) {
-        throw new HttpException('Resource not found', HttpStatus.NOT_FOUND);
-      }
+    request.user = user;
 
-      request.resourceId = resourceId;
+    const resource = await this.getResource(resourceType, resourceId);
 
-      const userId = await this.getOwner(resourceType, resourceId);
-
-      if (!userId) {
-        throw new HttpException('user not found', HttpStatus.NOT_FOUND);
-      }
-
-      if (userId !== user.sub) {
-        throw new UnauthorizedException({ message: 'You are not the user of this resource' });
-      }
-
-      return true;
-    } catch (error) {
-      console.log(error)
-      // throw new UnauthorizedException({ message: 'Unauthorized' });
+    if (!resource) {
+      throw new HttpException('Resource not found', HttpStatus.NOT_FOUND);
     }
+
+    request.resourceId = resourceId;
+
+    const userId = await this.getOwner(resourceType, resourceId);
+
+    if (!userId) {
+      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (userId !== user.sub) {
+      throw new UnauthorizedException({ message: 'You are not the user of this resource' });
+    }
+
+    return true;
+
+    // throw new UnauthorizedException({ message: 'Unauthorized' });
   }
 
   private getResourceId(request: any): string {
@@ -93,13 +90,13 @@ export class OwnerGuard implements CanActivate {
   private async getResource(resourceType: string, resourceId: string): Promise<any> {
     switch (resourceType) {
       case 'lists':
-        return this.listRepository.findOneBy({id: resourceId});
+        return this.listRepository.findOneBy({ id: resourceId });
       case 'tasks':
-        return this.taskRepository.findOneBy({id: resourceId});
+        return this.taskRepository.findOneBy({ id: resourceId });
       case 'projects':
-        return this.projectRepository.findOneBy({id: resourceId});
+        return this.projectRepository.findOneBy({ id: resourceId });
       case 'columns':
-        return this.columnRepository.findOneBy({id: resourceId});
+        return this.columnRepository.findOneBy({ id: resourceId });
       default:
         throw new HttpException('Invalid resource type', HttpStatus.BAD_REQUEST);
     }
@@ -108,19 +105,19 @@ export class OwnerGuard implements CanActivate {
   private async getOwner(resourceType: string, resourceId: string): Promise<string> {
     switch (resourceType) {
       case 'projects': {
-        const project = await this.projectRepository.findOne({ where: {id: resourceId}, relations: ['user'] });
+        const project = await this.projectRepository.findOne({ where: { id: resourceId }, relations: ['user'] });
         return project.user.id;
       }
       case 'lists': {
-        const list = await this.listRepository.findOne({ where: {id: resourceId},  relations: ['project', 'project.user'] });
+        const list = await this.listRepository.findOne({ where: { id: resourceId }, relations: ['project', 'project.user'] });
         return list.project.user.id;
       }
       case 'columns': {
-        const column = await this.columnRepository.findOne({ where: {id: resourceId}, relations: ['list', 'list.project', 'list.project.user'] });
+        const column = await this.columnRepository.findOne({ where: { id: resourceId }, relations: ['list', 'list.project', 'list.project.user'] });
         return column.list.project.user.id;
       }
       case 'tasks': {
-        const task = await this.taskRepository.findOne({ where: {id: resourceId}, relations: ['column', 'column.list', 'column.list.project', 'column.list.project.user'] });
+        const task = await this.taskRepository.findOne({ where: { id: resourceId }, relations: ['column', 'column.list', 'column.list.project', 'column.list.project.user'] });
         return task.column.list.project.user.id;
       }
       default:

@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UsersService } from 'src/users/users.service';
+import { title } from 'process';
 
 @Injectable()
 export class ProjectsService {
@@ -39,20 +40,23 @@ export class ProjectsService {
         return project;
     }
 
-    async update(projectId: string) {
-        const project = await this.projectRepo.findOneBy({id: projectId});
-    }
+    async update(projectId: string, projectDto: CreateProjectDto) {
+        await this.projectRepo.createQueryBuilder()
+        .update('projects')
+        .set({title: projectDto.title, description: projectDto.description})
+        .where("id = :id", { id: projectId })
+        .execute();
 
+        return await this.findOwnerById(projectId);
+    }
+    
     async findProjectByTitle(title: string) {
-        const project = await this.projectRepo.findOne({where: {title}, relations: {
-            lists: true,
-            user: false
-        }})
+        const project = await this.projectRepo.findOne({where: {title}, relations: ['lists']})
         return project;
     }
 
     async findOwnerById(id: string) {
-        const user = await this.projectRepo.findOne({where: {id}, relations: {user: true}})
+        const user = await this.projectRepo.findOne({where: {id}, relations: ['lists']})
         return user;
     }
 }
