@@ -49,6 +49,14 @@ export class ProjectsService {
 
         return await this.findOwnerById(projectId);
     }
+
+    async remove(projectId: string) {
+        await this.projectRepo.createQueryBuilder()
+        .delete()
+        .from('projects')
+        .where("id = :id", { id: projectId })
+        .execute();
+    }
     
     async findProjectByTitle(title: string) {
         const project = await this.projectRepo.findOne({where: {title}, relations: ['lists']})

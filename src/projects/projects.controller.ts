@@ -30,9 +30,10 @@ export class ProjectsController {
         return await this.projectService.update(projectId, projectDto);
     }
 
-    // @UseGuards(OwnerGuard)
-    // @Delete()
-    // async delete() {
-
-    // }
+    @UseGuards(OwnerGuard)
+    @Delete()
+    async delete(@Req() req: any) {
+        const projectId = req.resourceId;
+        return await this.projectService.remove(req.resourceId);
+    }
 }
