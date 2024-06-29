@@ -56,7 +56,7 @@ export class OwnerGuard implements CanActivate {
   }
 
   private getResourceId(request: any): string {
-    const { id } = request.body;
+    const { id } = request.params;
     if (!id) {
       throw new HttpException('Resource id missing in request body', HttpStatus.BAD_REQUEST);
     }
