@@ -41,6 +41,17 @@ export class ColumnsService {
         return await this.getColumnByTitle(columnDto.title);
     }
 
+    async remove(columnId: string) {
+        const found = await this.getColumnById(columnId);
+        if (!found) {
+            throw new HttpException('Column not found', HttpStatus.NOT_FOUND);
+        }
+
+        await this.columnRepo.delete({id: columnId});
+
+        return;
+    }
+
     async getColumnByTitle(title: string) {
         const column = await this.columnRepo.findOneBy({title: title});
         return column;

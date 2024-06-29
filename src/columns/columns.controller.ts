@@ -30,8 +30,9 @@ export class ColumnsController {
 
     @UseGuards(OwnerGuard)
     @Delete(':id')
-    async delete() {
-        
+    async delete(@Req() req: any) {
+        await this.columnService.remove(req.resourceId);
+        return;
     }
 
     // @UseGuards(UseGuards)
