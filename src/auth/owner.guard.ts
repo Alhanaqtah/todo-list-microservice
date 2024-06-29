@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { List } from 'src/lists/list.model';
 import { Task } from 'src/tasks/task.model';
 import { Project } from 'src/projects/project.model';
 import { Col } from 'src/columns/column.model';
@@ -12,8 +11,6 @@ import { Col } from 'src/columns/column.model';
 export class OwnerGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
-    @InjectRepository(List)
-    private listRepository: Repository<List>,
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
     @InjectRepository(Project)
@@ -89,8 +86,6 @@ export class OwnerGuard implements CanActivate {
 
   private async getResource(resourceType: string, resourceId: string): Promise<any> {
     switch (resourceType) {
-      case 'lists':
-        return this.listRepository.findOneBy({ id: resourceId });
       case 'tasks':
         return this.taskRepository.findOneBy({ id: resourceId });
       case 'projects':
@@ -108,17 +103,13 @@ export class OwnerGuard implements CanActivate {
         const project = await this.projectRepository.findOne({ where: { id: resourceId }, relations: ['user'] });
         return project.user.id;
       }
-      case 'lists': {
-        const list = await this.listRepository.findOne({ where: { id: resourceId }, relations: ['project', 'project.user'] });
-        return list.project.user.id;
-      }
       case 'columns': {
         const column = await this.columnRepository.findOne({ where: { id: resourceId }, relations: ['list', 'list.project', 'list.project.user'] });
-        return column.list.project.user.id;
+        return column.project.user.id;
       }
       case 'tasks': {
         const task = await this.taskRepository.findOne({ where: { id: resourceId }, relations: ['column', 'column.list', 'column.list.project', 'column.list.project.user'] });
-        return task.column.list.project.user.id;
+        return task.column.project.user.id;
       }
       default:
         throw new HttpException('Invalid resource type', HttpStatus.BAD_REQUEST);

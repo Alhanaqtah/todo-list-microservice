@@ -35,7 +35,7 @@ export class ProjectsService {
     async find(id: string) {
         const project = this.projectRepo.findOne({where: {id}, relations: {
             user: false,
-            lists: true,
+            columns: true,
         }});
         return project;
     }

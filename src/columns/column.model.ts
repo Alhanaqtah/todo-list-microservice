@@ -1,8 +1,8 @@
-import { List } from "src/lists/list.model";
+import { Project } from "src/projects/project.model";
 import { Task } from "src/tasks/task.model";
 import { OneToMany, PrimaryGeneratedColumn, Column, Entity, ManyToOne } from "typeorm";
 
-@Entity()
+@Entity({name: 'columns'})
 export class Col {
     @PrimaryGeneratedColumn('uuid')
     id: string
@@ -11,10 +11,10 @@ export class Col {
     title: string
 
     @Column({ type: 'integer', unique: true })
-    orber: number
+    order: number
 
-    @ManyToOne(type => List, list => list.columns)
-    list: List
+    @ManyToOne(type => Project, list => list.columns)
+    project: Project
 
     @OneToMany(type => Task, task => task.column, {onDelete: 'CASCADE'})
     tasks: Task[]

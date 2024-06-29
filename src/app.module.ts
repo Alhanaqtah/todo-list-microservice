@@ -11,8 +11,6 @@ import { Project } from './projects/project.model';
 import { Task } from './tasks/task.model';
 import { RolesModule } from './roles/roles.module';
 import { Role } from './roles/roles.model';
-import { ListsModule } from './lists/lists.module';
-import { List } from './lists/list.model';
 import { Col } from './columns/column.model';
 
 @Module({
@@ -27,7 +25,7 @@ import { Col } from './columns/column.model';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: [User, Project, Task, Role, List, Col],
+      entities: [User, Project, Task, Role, Col],
       synchronize: true,
       autoLoadEntities: true
     }),
@@ -37,7 +35,6 @@ import { Col } from './columns/column.model';
     TasksModule,
     ProjectsModule,
     RolesModule,
-    ListsModule
   ]
 })
 export class AppModule {}
