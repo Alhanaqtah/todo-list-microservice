@@ -26,8 +26,28 @@ export class ColumnsService {
         return column;
     }
 
+    async update(columnId: string, columnDto: CreateColumnDto) {
+        const found = await this.getColumnById(columnId);
+        if (!found) {
+            throw new HttpException('Column not found', HttpStatus.NOT_FOUND);
+        }
+
+        const res = await this.columnRepo.createQueryBuilder()
+        .update('columns')
+        .set({title: columnDto.title})
+        .where("id = :id", { id: columnId })
+        .execute();
+
+        return await this.getColumnByTitle(columnDto.title);
+    }
+
     async getColumnByTitle(title: string) {
         const column = await this.columnRepo.findOneBy({title: title});
+        return column;
+    }
+
+    async getColumnById(id: string) {
+        const column = await this.columnRepo.findOneBy({id: id});
         return column;
     }
 }

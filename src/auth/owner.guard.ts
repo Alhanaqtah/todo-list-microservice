@@ -104,7 +104,7 @@ export class OwnerGuard implements CanActivate {
         return project.user.id;
       }
       case 'columns': {
-        const column = await this.columnRepository.findOne({ where: { id: resourceId }, relations: ['list', 'list.project', 'list.project.user'] });
+        const column = await this.columnRepository.findOne({ where: { id: resourceId }, relations: ['project', 'project.user'] });
         return column.project.user.id;
       }
       case 'tasks': {

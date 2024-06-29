@@ -3,6 +3,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { ColumnsService } from './columns.service';
+import { OwnerGuard } from 'src/auth/owner.guard';
 
 @UseGuards(RolesGuard)
 @Controller('columns')
@@ -15,27 +16,27 @@ export class ColumnsController {
         return await this.columnService.create(columnDto);
     }
 
-    @UseGuards(UseGuards)
+    @UseGuards(OwnerGuard)
     @Get(':id')
     async read(@Req() req: any) {
         return await this.columnService.read(req.resourceId);
     }
 
-    @UseGuards(UseGuards)
+    @UseGuards(OwnerGuard)
     @Put(':id')
-    async update() {
-        
+    async update(@Req() req: any, @Body() columnDto: CreateColumnDto) {
+        return await this.columnService.update(req.resourceId, columnDto);
     }
 
-    @UseGuards(UseGuards)
+    @UseGuards(OwnerGuard)
     @Delete(':id')
     async delete() {
         
     }
 
-    @UseGuards(UseGuards)
-    @Put(':id')
-    async move() {
+    // @UseGuards(UseGuards)
+    // @Put('/move/:id')
+    // async move() {
         
-    }
+    // }
 }
