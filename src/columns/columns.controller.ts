@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { CreateColumnDto } from './dto/create-column.dto';
@@ -35,9 +35,9 @@ export class ColumnsController {
         return;
     }
 
-    // @UseGuards(UseGuards)
-    // @Put('/move/:id')
-    // async move() {
-        
-    // }
+    @UseGuards(UseGuards)
+    @Put('/move/:id')
+    async move(@Param('id') columnId: string, @Body('newOrder') newOrder: number) {
+        return this.columnService.moveColumn(columnId, newOrder);
+      }
 }
