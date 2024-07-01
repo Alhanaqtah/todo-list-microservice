@@ -1,3 +1,6 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export class UpdateOrderDto {
-    order: number
+    @ApiProperty({ example: 2, description: 'The new order of the column' })
+    order: number;
 }

@@ -9,6 +9,7 @@ import { Task } from 'src/tasks/task.model';
 @Module({
   controllers: [ColumnsController],
   providers: [ColumnsService],
-  imports: [TypeOrmModule.forFeature([Col, Project, Task])]
+  imports: [TypeOrmModule.forFeature([Col, Project, Task])],
+  exports: [ColumnsService]
 })
 export class ColumnsModule {}
