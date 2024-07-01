@@ -33,29 +33,19 @@ export class ProjectsService {
     }
 
     async find(id: string) {
-        const project = this.projectRepo.findOne({where: {id}, relations: {
-            user: false,
-            columns: true,
-        }});
+        const project = await this.projectRepo.findOne({where: {id}, relations: ['columns', 'columns.tasks']});
+        project.columns.sort((a, b) => a.order - b.order);
         return project;
     }
 
     async update(projectId: string, projectDto: CreateProjectDto) {
-        await this.projectRepo.createQueryBuilder()
-        .update('projects')
-        .set({title: projectDto.title, description: projectDto.description})
-        .where("id = :id", { id: projectId })
-        .execute();
+        const project = await this.projectRepo.update({id: projectId}, {...projectDto});
 
-        return await this.findOwnerById(projectId);
+        return await this.findProjectById(projectId);
     }
 
     async remove(projectId: string) {
-        await this.projectRepo.createQueryBuilder()
-        .delete()
-        .from('projects')
-        .where("id = :id", { id: projectId })
-        .execute();
+        await this.projectRepo.delete(projectId);
     }
     
     async findProjectByTitle(title: string) {
@@ -63,8 +53,8 @@ export class ProjectsService {
         return project;
     }
 
-    async findOwnerById(id: string) {
-        const user = await this.projectRepo.findOne({where: {id}, relations: ['lists']})
+    async findProjectById(id: string) {
+        const user = await this.projectRepo.findOne({where: {id}, relations: ['columns', 'columns.tasks']})
         return user;
     }
 }
