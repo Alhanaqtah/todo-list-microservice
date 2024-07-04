@@ -1,5 +1,5 @@
 export class CreateTaskDto {
-    columnId: string
-    title: string
-    description: string
+    readonly columnId: string
+    readonly title: string
+    readonly description: string
 }

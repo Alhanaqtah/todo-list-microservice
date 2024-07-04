@@ -1,5 +1,6 @@
 import { Col } from "src/columns/column.model";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { types } from "util";
 
 @Entity({name: 'tasks'})
 export class Task {
@@ -11,6 +12,9 @@ export class Task {
 
     @Column({type: 'text'})
     description: string
+
+    @Column({type: 'integer', unique: true})
+    order: number
 
     @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
     creation_time: Date

@@ -35,6 +35,7 @@ export class ProjectsService {
     async find(id: string) {
         const project = await this.projectRepo.findOne({where: {id}, relations: ['columns', 'columns.tasks']});
         project.columns.sort((a, b) => a.order - b.order);
+        project.columns.forEach(column => column.tasks.sort((a, b) => a.order - b.order));
         return project;
     }
 

@@ -42,7 +42,7 @@ export class ColumnsService {
     }
 
     async update(columnId: string, columnDto: CreateColumnDto) {
-        const found = await this.getColumnById(columnId);
+        const found = await this.columnRepo.findOneBy({id: columnId});
         if (!found) {
             throw new HttpException("Column not found", HttpStatus.NOT_FOUND);
         }
@@ -58,13 +58,7 @@ export class ColumnsService {
     }
 
     async remove(columnId: string) {
-        const found = await this.getColumnById(columnId);
-        if (!found) {
-            throw new HttpException("Column not found", HttpStatus.NOT_FOUND);
-        }
-
         await this.columnRepo.delete({ id: columnId });
-
         return;
     }
 
@@ -89,7 +83,7 @@ export class ColumnsService {
 
             const columns = project.columns.sort((a, b) => a.order - b.order);
 
-            if (newOrder < 0 || newOrder >= columns.length) {
+            if (newOrder < 0 || newOrder > columns.length) {
                 throw new HttpException('Invalid newOrder value', HttpStatus.BAD_REQUEST);
             }
 
@@ -134,11 +128,6 @@ export class ColumnsService {
 
     async getColumnByTitle(title: string) {
         const column = await this.columnRepo.findOneBy({ title: title });
-        return column;
-    }
-
-    async getColumnById(id: string) {
-        const column = await this.columnRepo.findOneBy({ id: id });
         return column;
     }
 }

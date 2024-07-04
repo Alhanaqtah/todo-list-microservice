@@ -5,6 +5,7 @@ import { OwnerGuard } from 'src/auth/owner.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { MoveTaskDto } from './dto/move-task.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -35,8 +36,8 @@ export class TasksController {
         return await this.taskService.remove(req.resourceId);
     }
 
-    @Put()
-    async move() {
-
+    @Put('/move/:id')
+    async move(@Req() req: any, @Body() taskDto: MoveTaskDto) {
+        return await this.taskService.move(req.resourceId, taskDto);
     }
 }
