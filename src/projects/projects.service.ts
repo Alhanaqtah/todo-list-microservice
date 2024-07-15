@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UsersService } from 'src/users/users.service';
-import { title } from 'process';
 
 @Injectable()
 export class ProjectsService {
@@ -12,16 +11,16 @@ export class ProjectsService {
                 private userService: UsersService) {}
 
     async create(user: any, projectDto: CreateProjectDto) {
-        if (!user || !user.sub) {
-            throw new HttpException('Invalid user data', HttpStatus.BAD_REQUEST);
-        }
-
         const found = await this.findProjectByTitle(projectDto.title);
         if (found) {
             throw new HttpException('Project already exists', HttpStatus.CONFLICT);
         }
 
         const usr = await this.userService.findUserByID(user.sub);
+        if (!usr) {
+            console.log("failed to get user")
+            throw new HttpException('Failed to create project', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         const prj = this.projectRepo.create({...projectDto, user: usr});
 
@@ -40,8 +39,8 @@ export class ProjectsService {
     }
 
     async update(projectId: string, projectDto: CreateProjectDto) {
-        const project = await this.projectRepo.update({id: projectId}, {...projectDto});
-
+        console.debug("id", projectId)
+        console.debug(await this.projectRepo.update({id: projectId}, {title: projectDto.title, description: projectDto.description}));
         return await this.findProjectById(projectId);
     }
 
@@ -50,7 +49,7 @@ export class ProjectsService {
     }
     
     async findProjectByTitle(title: string) {
-        const project = await this.projectRepo.findOne({where: {title}, relations: ['lists']})
+        const project = await this.projectRepo.findOne({where: {title}})
         return project;
     }
 

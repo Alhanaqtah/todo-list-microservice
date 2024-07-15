@@ -11,8 +11,6 @@ import { MoveTaskDto } from './dto/move-task.dto';
 export class TasksController {
     constructor(private taskService: TasksService) {}
 
-    @UseGuards(RolesGuard)
-    @Roles('user', 'admin')
     @Post()
     async create(@Body() taskDto: CreateTaskDto) {
         return await this.taskService.create(taskDto);

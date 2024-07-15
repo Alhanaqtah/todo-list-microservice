@@ -27,6 +27,6 @@ export class User {
 
     @ApiProperty({example: Role, description: 'Роли пользователя'})
     @ManyToMany(type => Role, role => role.users, {onDelete: 'CASCADE'})
-    @JoinTable()
+    @JoinTable({name: 'users_roles'})
     roles: Role[]    
 }

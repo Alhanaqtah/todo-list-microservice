@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Col } from 'src/columns/column.model';
 import { User } from 'src/users/user.model';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'projects' })
 export class Project {
@@ -21,11 +21,12 @@ export class Project {
     @ApiProperty({ example: '2024-06-28T12:34:56.789Z', description: 'The creation time of the project', type: 'string', format: 'date-time' })
     creation_time: Date;
 
-    @OneToMany(type => Col, list => list.project, { onDelete: 'CASCADE' })
+    @OneToMany(type => Col, list => list.project)
     @ApiProperty({ type: () => [Col], description: 'The columns associated with the project' })
     columns: Col[];
 
-    @ManyToOne(type => User, user => user.projects)
+    @ManyToOne(type => User, user => user.projects, {onDelete: 'CASCADE'})
+    @JoinColumn({name: 'user_id'})
     // @ApiProperty({ type: () => User, description: 'The user who owns the project' })
     user: User;
 }

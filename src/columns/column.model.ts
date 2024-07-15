@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Project } from "src/projects/project.model";
 import { Task } from "src/tasks/task.model";
-import { OneToMany, PrimaryGeneratedColumn, Column, Entity, ManyToOne } from "typeorm";
+import { OneToMany, PrimaryGeneratedColumn, Column, Entity, ManyToOne, JoinColumn } from "typeorm";
 
 @Entity({name: 'columns'})
 export class Col {
@@ -17,11 +17,11 @@ export class Col {
     @ApiProperty({ example: 1, description: 'The order of the column' })
     order: number;
 
-    @ManyToOne(type => Project, project => project.columns)
+    @ManyToOne(type => Project, project => project.columns, {onDelete: 'CASCADE'})
     @ApiProperty({ type: () => Project, description: 'The project this column belongs to' })
     project: Project;
 
-    @OneToMany(type => Task, task => task.column, { onDelete: 'CASCADE' })
+    @OneToMany(type => Task, task => task.column)
     @ApiProperty({ type: () => [Task], description: 'The tasks in this column' })
     tasks: Task[];
 }

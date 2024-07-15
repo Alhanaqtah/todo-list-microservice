@@ -53,7 +53,7 @@ export class UsersService {
     }
 
     async findUserByID(id: string): Promise<User> {
-        const user = await this.userRepo.findOne({where: {id}});
+        const user = await this.userRepo.findOneBy({id: id});
         return user;
     }
 }

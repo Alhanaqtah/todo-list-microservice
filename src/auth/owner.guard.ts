@@ -17,7 +17,7 @@ export class OwnerGuard implements CanActivate {
     private projectRepository: Repository<Project>,
     @InjectRepository(Col)
     private columnRepository: Repository<Col>,
-  ) { }
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -28,41 +28,28 @@ export class OwnerGuard implements CanActivate {
     const user = this.verifyToken(token);
 
     request.user = user;
-
-    const resource = await this.getResource(resourceType, resourceId);
-
-    if (!resource) {
-      throw new HttpException('Resource not found', HttpStatus.NOT_FOUND);
-    }
-
     request.resourceId = resourceId;
 
-    const userId = await this.getOwner(resourceType, resourceId);
+    const ownerId = await this.getOwner(resourceType, resourceId);
 
-    if (!userId) {
-      throw new HttpException('user not found', HttpStatus.NOT_FOUND);
-    }
-
-    if (userId !== user.sub) {
-      throw new UnauthorizedException({ message: 'You are not the user of this resource' });
+    if (ownerId !== user.sub) {
+      throw new UnauthorizedException({ message: 'You are not the owner of this resource' });
     }
 
     return true;
-
-    // throw new UnauthorizedException({ message: 'Unauthorized' });
   }
 
   private getResourceId(request: any): string {
-    const { id } = request.params;
+    let { id } = request.params;
     if (!id) {
-      throw new HttpException('Resource id missing in request body', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Resource id missing', HttpStatus.BAD_REQUEST);
     }
     return id;
   }
 
   private getResourceType(url: string): string {
     const parts = url.split('/');
-    if (!['lists', 'tasks', 'projects', 'columns'].includes(parts[1])) {
+    if (!['tasks', 'projects', 'columns'].includes(parts[1])) {
       throw new HttpException('Invalid resource type', HttpStatus.BAD_REQUEST);
     }
     return parts[1];
@@ -81,19 +68,6 @@ export class OwnerGuard implements CanActivate {
       return this.jwtService.verify(token);
     } catch (error) {
       throw new UnauthorizedException({ message: 'Invalid token' });
-    }
-  }
-
-  private async getResource(resourceType: string, resourceId: string): Promise<any> {
-    switch (resourceType) {
-      case 'tasks':
-        return this.taskRepository.findOneBy({ id: resourceId });
-      case 'projects':
-        return this.projectRepository.findOneBy({ id: resourceId });
-      case 'columns':
-        return this.columnRepository.findOneBy({ id: resourceId });
-      default:
-        throw new HttpException('Invalid resource type', HttpStatus.BAD_REQUEST);
     }
   }
 

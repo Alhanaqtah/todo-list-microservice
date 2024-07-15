@@ -27,7 +27,7 @@ import { Col } from './columns/column.model';
       database: process.env.POSTGRES_DB,
       entities: [User, Project, Task, Role, Col],
       synchronize: true,
-      autoLoadEntities: true
+      autoLoadEntities: true,
     }),
     AuthModule,
     UsersModule,
