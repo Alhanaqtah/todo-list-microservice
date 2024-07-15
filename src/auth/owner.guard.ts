@@ -83,21 +83,35 @@ export class OwnerGuard implements CanActivate {
   }
 
   private async getOwner(resourceType: string, resourceId: string): Promise<string> {
+    let user;
     switch (resourceType) {
       case 'projects': {
         const project = await this.projectRepository.findOne({ where: { id: resourceId }, relations: ['user'] });
-        return project.user.id;
+        if (!project) {
+          throw new HttpException('Resource not found', HttpStatus.NOT_FOUND);
+        }
+        user = project.user;
+        break;
       }
       case 'columns': {
         const column = await this.columnRepository.findOne({ where: { id: resourceId }, relations: ['project', 'project.user'] });
-        return column.project.user.id;
+        if (!column || !column.project) {
+          throw new HttpException('Resource not found', HttpStatus.NOT_FOUND);
+        }
+        user = column.project.user;
+        break;
       }
       case 'tasks': {
         const task = await this.taskRepository.findOne({ where: { id: resourceId }, relations: ['column', 'column.project', 'column.project.user'] });
-        return task.column.project.user.id;
+        if (!task || !task.column || !task.column.project) {
+          throw new HttpException('Resource not found', HttpStatus.NOT_FOUND);
+        }
+        user = task.column.project.user;
+        break;
       }
       default:
         throw new HttpException('Invalid resource type', HttpStatus.BAD_REQUEST);
     }
+    return user.id;
   }
 }

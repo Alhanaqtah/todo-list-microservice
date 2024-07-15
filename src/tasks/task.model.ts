@@ -13,7 +13,7 @@ export class Task {
     @Column({type: 'text'})
     description: string
 
-    @Column({type: 'integer', unique: true})
+    @Column({type: 'integer'})
     order: number
 
     @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})

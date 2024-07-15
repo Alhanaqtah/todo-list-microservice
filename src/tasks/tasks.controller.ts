@@ -2,11 +2,8 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from 
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { OwnerGuard } from 'src/auth/owner.guard';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { Roles } from 'src/auth/roles.decorator';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { MoveTaskDto } from './dto/move-task.dto';
-import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('tasks')
 export class TasksController {
