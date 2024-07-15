@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { DataSource, Repository } from "typeorm";
+import { DataSource, EntityManager, Repository } from "typeorm";
 import { Col } from "./column.model";
 import { CreateColumnDto } from "./dto/create-column.dto";
 import { Project } from "src/projects/project.model";
@@ -11,8 +11,7 @@ export class ColumnsService {
     constructor(
         @InjectRepository(Col) private columnRepo: Repository<Col>,
         @InjectRepository(Project) private projectRepo: Repository<Project>,
-        private dataSource: DataSource
-    ) { }
+    ){}
 
     async create(columnDto: CreateColumnDto) {
         const found = await this.getColumnByTitle(columnDto.title);
@@ -62,68 +61,58 @@ export class ColumnsService {
         return;
     }
 
-    async moveColumn(columnId: string, newOrder: number) {
-        const queryRunner = this.columnRepo.manager.connection.createQueryRunner();
-        await queryRunner.connect();
-        await queryRunner.startTransaction();
-
-        try {
-            const columnRepository = queryRunner.manager.getRepository(Col);
-            const projectRepository = queryRunner.manager.getRepository(Project);
-
-            const columnToMove = await columnRepository.findOne({ where: { id: columnId }, relations: ['project'] });
-            if (!columnToMove) {
-                throw new HttpException('Column not found', HttpStatus.NOT_FOUND);
-            }
-
-            const project = await projectRepository.findOne({
-                where: { id: columnToMove.project.id },
-                relations: ['columns']
-            });
-
-            const columns = project.columns.sort((a, b) => a.order - b.order);
-
-            if (newOrder < 0 || newOrder > columns.length) {
-                throw new HttpException('Invalid newOrder value', HttpStatus.BAD_REQUEST);
-            }
-
-            if (newOrder === columnToMove.order) {
-                return columnToMove;
-            }
-
-            const tempOrder = -1;
-            await columnRepository.update({ id: columnToMove.id }, { order: tempOrder });
-
-            // Обновляем порядок колонок между текущей и новой позицией
-            if (newOrder > columnToMove.order) {
-                // Если колонка перемещается вперед
-                for (let i = columnToMove.order + 1; i <= newOrder; i++) {
-                    const col = columns.find(column => column.order === i);
-                    if (col) {
-                        await columnRepository.update({ id: col.id }, { order: i - 1 });
-                    }
-                }
-            } else {
-                // Если колонка перемещается назад
-                for (let i = columnToMove.order - 1; i >= newOrder; i--) {
-                    const col = columns.find(column => column.order === i);
-                    if (col) {
-                        await columnRepository.update({ id: col.id }, { order: i + 1 });
-                    }
-                }
-            }
-
-            await columnRepository.update({ id: columnToMove.id }, { order: newOrder });
-
-            await queryRunner.commitTransaction();
-
-            return { ...columnToMove, order: newOrder };
-        } catch (error) {
-            await queryRunner.rollbackTransaction();
-            throw error;
-        } finally {
-            await queryRunner.release();
+    async moveColumn(columnId: string, newOrder: number): Promise<Col[]> {
+        const columnToMove = await this.columnRepo.findOne({ where: { id: columnId }, relations: ['project'] });
+        if (!columnToMove) {
+            throw new Error('Column not found');
         }
+    
+        const project = await this.projectRepo.findOne({ where: { id: columnToMove.project.id }, relations: ['columns'] });
+        if (!project) {
+            throw new Error('Project not found');
+        }
+    
+        const columns = project.columns.sort((a, b) => a.order - b.order);
+    
+        // Валидация newOrder
+        if (newOrder < 1 || newOrder > columns.length) {
+            throw new HttpException("Invalid value of new column's order", HttpStatus.BAD_REQUEST);
+        }
+    
+        // Извлечение колонки из текущего места
+        const columnIndex = columns.findIndex(col => col.id === columnId);
+        const [column] = columns.splice(columnIndex, 1);
+    
+        // Вставка колонки в новую позицию
+        columns.splice(newOrder - 1, 0, column);
+    
+        // Выполнение обновления в транзакции
+        await this.columnRepo.manager.transaction(async (transactionalEntityManager: EntityManager) => {
+            // Установить временные значения, которые гарантированно уникальны
+            const tempOrderValues = columns.map((col, index) => ({ id: col.id, order: -index }));
+    
+            // Применить временные значения order
+            for (let tempOrder of tempOrderValues) {
+                await transactionalEntityManager.update('Col', { id: tempOrder.id }, { order: tempOrder.order });
+            }
+    
+            // Обновление окончательного значения order
+            for (let i = 0; i < columns.length; i++) {
+                await transactionalEntityManager.update('Col', { id: columns[i].id }, { order: i + 1 });
+            }
+        });
+    
+        // Вернуть обновленные данные проекта
+        const updatedProject = await this.projectRepo.findOne({
+            where: { id: project.id },
+            relations: ['columns']
+        });
+    
+        if (!updatedProject) {
+            throw new Error('Updated project not found');
+        }
+    
+        return updatedProject.columns;
     }
 
     async getColumnByTitle(title: string) {
