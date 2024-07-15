@@ -6,11 +6,13 @@ import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { MoveTaskDto } from './dto/move-task.dto';
+import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('tasks')
 export class TasksController {
     constructor(private taskService: TasksService) {}
 
+    @UseGuards(OwnerGuard)
     @Post()
     async create(@Body() taskDto: CreateTaskDto) {
         return await this.taskService.create(taskDto);
@@ -34,6 +36,7 @@ export class TasksController {
         return await this.taskService.remove(req.resourceId);
     }
 
+    @UseGuards(OwnerGuard)
     @Put('/move/:id')
     async move(@Req() req: any, @Body() taskDto: MoveTaskDto) {
         return await this.taskService.move(req.resourceId, taskDto);

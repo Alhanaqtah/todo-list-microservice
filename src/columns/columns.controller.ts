@@ -1,19 +1,16 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth, ApiCreatedResponse } from '@nestjs/swagger';
-import { Roles } from 'src/auth/roles.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { ColumnsService } from './columns.service';
 import { OwnerGuard } from 'src/auth/owner.guard';
 import { Col } from './column.model';
-import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('columns')
 @Controller('columns')
 export class ColumnsController {
     constructor(private columnService: ColumnsService) {}
 
-    @UseGuards(JWTAuthGuard)
+    @UseGuards(OwnerGuard)
     @ApiOperation({ summary: 'Create a new column' })
     @ApiResponse({ status: 201, description: 'The column has been successfully created.', type: Col })
     @ApiResponse({ status: 403, description: 'Forbidden.' })
@@ -55,13 +52,13 @@ export class ColumnsController {
         return;
     }
 
-    @UseGuards(OwnerGuard)
     @ApiOperation({ summary: 'Move column to a new order' })
     @ApiResponse({ status: 200, description: 'The column has been successfully moved.', type: Col })
     @ApiResponse({ status: 400, description: 'Invalid newOrder value.' })
     @ApiResponse({ status: 404, description: 'Column not found.' })
     @ApiParam({ name: 'id', description: 'Column ID' })
     @ApiBody({ schema: { type: 'object', properties: { newOrder: { type: 'number', example: 1 }}}})
+    @UseGuards(OwnerGuard)
     @Put('/move/:id')
     async move(@Param('id') columnId: string, @Body('newOrder') newOrder: number) {
         return this.columnService.moveColumn(columnId, newOrder);

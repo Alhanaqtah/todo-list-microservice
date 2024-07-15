@@ -22,8 +22,9 @@ export class OwnerGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    const resourceId = this.getResourceId(request);
-    const resourceType = this.getResourceType(request.url);
+    let resourceType = this.getResourceType(request.url);
+    let resourceId: string;
+    [resourceId, resourceType] = this.getResourceId(request, resourceType);
     const token = this.getToken(request);
     const user = this.verifyToken(token);
 
@@ -39,13 +40,23 @@ export class OwnerGuard implements CanActivate {
     return true;
   }
 
-  private getResourceId(request: any): string {
+  private getResourceId(request: any, resourceType: string): [string, string] {
     let { id } = request.params;
+
     if (!id) {
+      if (resourceType === 'columns' && request.body.projectId) {
+        resourceType = 'projects';
+        return [request.body.projectId, resourceType];
+      } else if (resourceType === 'tasks' && request.body.columnId) {
+        resourceType = 'columns';
+        return [request.body.columnId, resourceType];
+      }
       throw new HttpException('Resource id missing', HttpStatus.BAD_REQUEST);
     }
-    return id;
+  
+    return [id, resourceType];
   }
+  
 
   private getResourceType(url: string): string {
     const parts = url.split('/');
