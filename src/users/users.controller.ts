@@ -21,7 +21,7 @@ export class UsersController {
     }
 
     @Get(':id')
-    async read(@Param() userId: string) {
+    async read(@Param('id') userId: string) {
         return this.userService.read(userId);
     }
 
@@ -31,7 +31,7 @@ export class UsersController {
     }
 
     @Delete(':id')
-    async delete(@Body() userDto: CreateUserDto) {
-        return this.userService.createUser(userDto);
+    async delete(@Param('id') userId: string) {
+        return this.userService.remove(userId);
     }
 }

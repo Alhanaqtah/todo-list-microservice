@@ -48,7 +48,9 @@ export class UsersService {
     }
 
     async read(userId: string) {
-        return this.userRepo.findOneBy({id: userId})
+        const user = await this.userRepo.findOneBy({id: userId});
+        delete user.password;
+        return user;
     }
 
     async update(userId: string, userDto: CreateUserDto) {
@@ -85,6 +87,10 @@ export class UsersService {
         console.debug('Updated user:', user);
     
         return this.userRepo.save(user);
+    }
+
+    async remove(userId: string) {
+        this.userRepo.delete({id: userId});
     }
 
     async findUserByEmail(email: string): Promise<User> {
