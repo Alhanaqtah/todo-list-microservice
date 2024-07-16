@@ -10,7 +10,7 @@ export class Task {
     @Column({type: 'text', unique: true})
     title: string
 
-    @Column({type: 'text'})
+    @Column({type: 'text', unique: false})
     description: string
 
     @Column({type: 'integer'})

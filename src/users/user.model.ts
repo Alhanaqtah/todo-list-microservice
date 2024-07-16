@@ -20,7 +20,7 @@ export class User {
 
     @ApiProperty({example: true, description: 'Активен пользователь или забанен'})
     @Column({type: 'boolean', default: true})
-    isActive: boolean
+    is_active: boolean
 
     @OneToMany(type => Project, project => project.user)
     projects: Project[]

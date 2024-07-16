@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { RolesService } from './roles.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -6,9 +6,9 @@ import { User } from 'src/users/user.model';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 
+@ApiTags('roles')
 @UseGuards(RolesGuard)
 @Roles('admin')
-@ApiTags('roles')
 @Controller('roles')
 export class RolesController {
     constructor(private roleService: RolesService) {}
@@ -25,5 +25,10 @@ export class RolesController {
     @Post()
     create(@Body() roleDto: CreateRoleDto) {
         return this.roleService.create(roleDto);
+    }
+
+    @Put(':id')
+    update(@Param() roleId: string, @Body() roleDto: CreateRoleDto) {
+        return this.roleService.update(roleId, roleDto);
     }
 }
