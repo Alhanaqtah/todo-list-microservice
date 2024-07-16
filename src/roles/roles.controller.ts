@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { RolesService } from './roles.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -30,5 +30,10 @@ export class RolesController {
     @Put(':id')
     update(@Param() roleId: string, @Body() roleDto: CreateRoleDto) {
         return this.roleService.update(roleId, roleDto);
+    }
+
+    @Delete(':id')
+    delete(@Param() roleId: string) {
+        return this.roleService.remove(roleId);
     }
 }

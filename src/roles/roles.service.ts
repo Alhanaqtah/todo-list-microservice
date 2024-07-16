@@ -29,7 +29,11 @@ export class RolesService {
 
     async update(roleId: string, roleDto: CreateRoleDto) {
         this.roleRepo.update(roleId, {...roleDto})
-        return await roleDto;
+        return roleDto;
+    }
+
+    async remove(roleId: string) {
+        this.roleRepo.delete(roleId)
     }
 
     async getRoleByValue(value: string): Promise<Role> {
