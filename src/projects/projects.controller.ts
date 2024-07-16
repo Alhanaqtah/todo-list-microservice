@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Delete, Body, Req, UseGuards, Param, Inject } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Body, Req, UseGuards } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { OwnerGuard } from 'src/auth/owner.guard';

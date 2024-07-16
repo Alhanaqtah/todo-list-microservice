@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from './dto/create-user.fto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { User } from 'src/users/user.model';
 import { UsersService } from 'src/users/users.service';
 import * as bcryptjs from 'bcryptjs';
