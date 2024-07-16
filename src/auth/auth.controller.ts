@@ -9,15 +9,15 @@ import { User } from 'src/users/user.model';
 export class AuthController {
     constructor(private authService: AuthService) {}
 
-    @ApiOperation({summary: 'Регестрация пользователя'})
-    @ApiResponse({status: 201, type: User})
+    @ApiOperation({ summary: 'Регистрация пользователя' })
+    @ApiResponse({ status: 201, description: 'Пользователь успешно зарегистрирован.', type: User })
     @Post('/signin')
     async signin(@Body() userDto: CreateUserDto) {
         return this.authService.createUser(userDto);
     }
 
-    @ApiOperation({summary: 'Вход в систему'})
-    @ApiResponse({status: 200, type: 'token'})
+    @ApiOperation({ summary: 'Вход в систему' })
+    @ApiResponse({ status: 200, description: 'Аутентификация успешна. Возвращает токен доступа.', type: 'token' })
     @Post('/login')
     login(@Body() userDto: CreateUserDto) {
         return this.authService.login(userDto);

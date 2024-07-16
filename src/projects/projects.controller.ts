@@ -12,9 +12,9 @@ import { Project } from './project.model';
 export class ProjectsController {
     constructor(private projectService: ProjectsService) {}
 
-    @ApiOperation({ summary: 'Create project' })
-    @ApiResponse({ status: 201, description: 'The project has been successfully created.', type: Project })
-    @ApiResponse({ status: 403, description: 'Forbidden.' })
+    @ApiOperation({ summary: 'Создать проект' })
+    @ApiResponse({ status: 201, description: 'Проект успешно создан.', type: Project })
+    @ApiResponse({ status: 403, description: 'Доступ запрещен.' })
     @ApiBody({ type: CreateProjectDto })
     @UseGuards(JWTAuthGuard)
     @Post()
@@ -22,11 +22,11 @@ export class ProjectsController {
         return await this.projectService.create(req.user, projectDto);
     }
 
-    @ApiOperation({ summary: 'Get project' })
-    @ApiOkResponse({ description: 'The project has been successfully retrieved.', type: Project })
-    @ApiResponse({ status: 403, description: 'Forbidden.' })
-    @ApiResponse({ status: 404, description: 'Not Found.' })
-    @ApiParam({ name: 'id', description: 'The ID of the project' })
+    @ApiOperation({ summary: 'Получить проект' })
+    @ApiOkResponse({ description: 'Проект успешно найден.', type: Project })
+    @ApiResponse({ status: 403, description: 'Доступ запрещен.' })
+    @ApiResponse({ status: 404, description: 'Проект не найден.' })
+    @ApiParam({ name: 'id', description: 'ID проекта' })
     @UseGuards(OwnerGuard)
     @Get(':id')
     async read(@Req() req: any) {
@@ -34,11 +34,11 @@ export class ProjectsController {
         return await this.projectService.find(projectId);
     }
 
-    @ApiOperation({ summary: 'Update project' })
-    @ApiOkResponse({ description: 'The project has been successfully updated.', type: Project })
-    @ApiResponse({ status: 403, description: 'Forbidden.' })
-    @ApiResponse({ status: 404, description: 'Not Found.' })
-    @ApiParam({ name: 'id', description: 'The ID of the project' })
+    @ApiOperation({ summary: 'Обновить проект' })
+    @ApiOkResponse({ description: 'Проект успешно обновлен.', type: Project })
+    @ApiResponse({ status: 403, description: 'Доступ запрещен.' })
+    @ApiResponse({ status: 404, description: 'Проект не найден.' })
+    @ApiParam({ name: 'id', description: 'ID проекта' })
     @ApiBody({ type: CreateProjectDto })
     @UseGuards(OwnerGuard)
     @Put(':id')
@@ -47,11 +47,11 @@ export class ProjectsController {
         return await this.projectService.update(projectId, projectDto);
     }
 
-    @ApiOperation({ summary: 'Delete project' })
-    @ApiOkResponse({ description: 'The project has been successfully deleted.' })
-    @ApiResponse({ status: 403, description: 'Forbidden.' })
-    @ApiResponse({ status: 404, description: 'Not Found.' })
-    @ApiParam({ name: 'id', description: 'The ID of the project' })
+    @ApiOperation({ summary: 'Удалить проект' })
+    @ApiOkResponse({ description: 'Проект успешно удален.' })
+    @ApiResponse({ status: 403, description: 'Доступ запрещен.' })
+    @ApiResponse({ status: 404, description: 'Проект не найден.' })
+    @ApiParam({ name: 'id', description: 'ID проекта' })
     @UseGuards(OwnerGuard)
     @Delete(':id')
     async delete(@Req() req: any) {

@@ -1,64 +1,61 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateColumnDto } from './dto/create-column.dto';
 import { ColumnsService } from './columns.service';
 import { OwnerGuard } from 'src/auth/owner.guard';
 import { Col } from './column.model';
 
 @ApiTags('columns')
+@ApiBearerAuth()
+@UseGuards(OwnerGuard)
 @Controller('columns')
 export class ColumnsController {
     constructor(private columnService: ColumnsService) {}
 
-    @UseGuards(OwnerGuard)
-    @ApiOperation({ summary: 'Create a new column' })
-    @ApiResponse({ status: 201, description: 'The column has been successfully created.', type: Col })
-    @ApiResponse({ status: 403, description: 'Forbidden.' })
+    @ApiOperation({ summary: 'Создать новую колонку' })
+    @ApiResponse({ status: 201, description: 'Колонка успешно создана.', type: Col })
+    @ApiResponse({ status: 403, description: 'Доступ запрещен.' })
     @ApiBody({ type: CreateColumnDto })
     @Post()
     async create(@Body() columnDto: CreateColumnDto) {
         return await this.columnService.create(columnDto);
     }
 
-    @UseGuards(OwnerGuard)
-    @ApiOperation({ summary: 'Get column by ID' })
-    @ApiResponse({ status: 200, description: 'The column has been successfully fetched.', type: Col })
-    @ApiResponse({ status: 404, description: 'Column not found.' })
-    @ApiParam({ name: 'id', description: 'Column ID' })
+    @ApiOperation({ summary: 'Получить колонку по ID' })
+    @ApiResponse({ status: 200, description: 'Колонка успешно найдена.', type: Col })
+    @ApiResponse({ status: 404, description: 'Колонка не найдена.' })
+    @ApiParam({ name: 'id', description: 'ID колонки' })
     @Get(':id')
-    async read(@Req() req: any) {
-        return await this.columnService.read(req.resourceId);
+    async read(@Param('id') columnId: string) {
+        return await this.columnService.read(columnId);
     }
 
-    @UseGuards(OwnerGuard)
-    @ApiOperation({ summary: 'Update column by ID' })
-    @ApiResponse({ status: 200, description: 'The column has been successfully updated.', type: Col })
-    @ApiResponse({ status: 404, description: 'Column not found.' })
-    @ApiParam({ name: 'id', description: 'Column ID' })
+    @ApiOperation({ summary: 'Обновить колонку по ID' })
+    @ApiResponse({ status: 200, description: 'Колонка успешно обновлена.', type: Col })
+    @ApiResponse({ status: 404, description: 'Колонка не найдена.' })
+    @ApiParam({ name: 'id', description: 'ID колонки' })
     @ApiBody({ type: CreateColumnDto })
     @Put(':id')
-    async update(@Req() req: any, @Body() columnDto: CreateColumnDto) {
-        return await this.columnService.update(req.resourceId, columnDto);
+    async update(@Param('id') columnId: string, @Body() columnDto: CreateColumnDto) {
+        return await this.columnService.update(columnId, columnDto);
     }
 
-    @UseGuards(OwnerGuard)
-    @ApiOperation({ summary: 'Delete column by ID' })
-    @ApiResponse({ status: 200, description: 'The column has been successfully deleted.' })
-    @ApiResponse({ status: 404, description: 'Column not found.' })
-    @ApiParam({ name: 'id', description: 'Column ID' })
+    @ApiOperation({ summary: 'Удалить колонку по ID' })
+    @ApiResponse({ status: 200, description: 'Колонка успешно удалена.' })
+    @ApiResponse({ status: 404, description: 'Колонка не найдена.' })
+    @ApiParam({ name: 'id', description: 'ID колонки' })
     @Delete(':id')
-    async delete(@Req() req: any) {
-        await this.columnService.remove(req.resourceId);
+    async delete(@Param('id') columnId: string) {
+        await this.columnService.remove(columnId);
         return;
     }
 
-    @ApiOperation({ summary: 'Move column to a new order' })
-    @ApiResponse({ status: 200, description: 'The column has been successfully moved.', type: Col })
-    @ApiResponse({ status: 400, description: 'Invalid newOrder value.' })
-    @ApiResponse({ status: 404, description: 'Column not found.' })
-    @ApiParam({ name: 'id', description: 'Column ID' })
-    @ApiBody({ schema: { type: 'object', properties: { newOrder: { type: 'number', example: 1 }}}})
-    @UseGuards(OwnerGuard)
+    @ApiOperation({ summary: 'Переместить колонку на новую позицию' })
+    @ApiResponse({ status: 200, description: 'Колонка успешно перемещена.', type: Col })
+    @ApiResponse({ status: 400, description: 'Недопустимое значение newOrder.' })
+    @ApiResponse({ status: 404, description: 'Колонка не найдена.' })
+    @ApiParam({ name: 'id', description: 'ID колонки' })
+    @ApiBody({ schema: { type: 'object', properties: { newOrder: { type: 'number', example: 1 } } } })
     @Put('/move/:id')
     async move(@Param('id') columnId: string, @Body('newOrder') newOrder: number) {
         return this.columnService.moveColumn(columnId, newOrder);
