@@ -6,12 +6,13 @@ import { Task } from './task.model';
 import { Project } from 'src/projects/project.model';
 import { Col } from 'src/columns/column.model';
 import { ColumnsModule } from 'src/columns/columns.module';
+import { User } from 'src/users/user.model';
 
 @Module({
   controllers: [TasksController],
   providers: [TasksService],
   imports: [
-    TypeOrmModule.forFeature([Task, Project, Col]),
+    TypeOrmModule.forFeature([Task, Project, Col, User]),
     ColumnsModule
   ]
 })

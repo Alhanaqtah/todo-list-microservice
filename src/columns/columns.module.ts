@@ -5,11 +5,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Col } from './column.model';
 import { Project } from 'src/projects/project.model';
 import { Task } from 'src/tasks/task.model';
+import { User } from 'src/users/user.model';
 
 @Module({
   controllers: [ColumnsController],
   providers: [ColumnsService],
-  imports: [TypeOrmModule.forFeature([Col, Project, Task])],
+  imports: [TypeOrmModule.forFeature([Col, Project, Task, User])],
   exports: [ColumnsService]
 })
 export class ColumnsModule {}

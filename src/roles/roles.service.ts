@@ -36,6 +36,10 @@ export class RolesService {
         this.roleRepo.delete(roleId)
     }
 
+    async findRolesByIds(roleIds: string[]): Promise<Role[]> {
+        return this.roleRepo.findByIds(roleIds);
+    }
+
     async getRoleByValue(value: string): Promise<Role> {
         const role = await this.roleRepo.findOne({where: {value}});
         return role
