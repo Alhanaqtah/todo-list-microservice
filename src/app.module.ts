@@ -8,6 +8,7 @@ import { Project } from './projects/project.model';
 import { Task } from './tasks/task.model';
 import { Col } from './columns/column.model';
 import { JwtModule } from '@nestjs/jwt';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -37,6 +38,6 @@ import { JwtModule } from '@nestjs/jwt';
     ColumnsModule,
     TasksModule,
     ProjectsModule,
-  ]
+  ],
 })
 export class AppModule {}

@@ -6,6 +6,8 @@ import { Project } from './project.model';
 import { Col } from 'src/columns/column.model';
 import { Task } from 'src/tasks/task.model';
 import { JwtModule } from '@nestjs/jwt';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   controllers: [ProjectsController],
@@ -14,6 +16,6 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule,
     TypeOrmModule.forFeature([Project, Col, Task]),
   ],
-  exports: [ProjectsService]
+  exports: [ProjectsService],
 })
 export class ProjectsModule {}

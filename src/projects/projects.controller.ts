@@ -5,6 +5,7 @@ import { OwnerGuard } from 'src/guards/owner.guard';
 import { JWTAuthGuard } from 'src/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiBody, ApiOkResponse, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Project } from './project.model';
+import { EventPattern, Payload } from '@nestjs/microservices';
 
 @ApiTags('projects')
 @ApiBearerAuth()
@@ -57,5 +58,10 @@ export class ProjectsController {
     async delete(@Req() req: any) {
         const projectId = req.resourceId;
         return await this.projectService.remove(projectId);
+    }
+
+    @EventPattern('remove-user-data')
+    async handleRemoveUserData(@Payload() data: {id: string}) {
+        await this.projectService.handleRemoveUserData(data.id);
     }
 }

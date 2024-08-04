@@ -20,7 +20,7 @@ export class Project {
     @ApiProperty({ example: '2024-06-28T12:34:56.789Z', description: 'The creation time of the project', type: 'string', format: 'date-time' })
     creation_time: Date;
 
-    @OneToMany(type => Col, list => list.project)
+    @OneToMany(type => Col, list => list.project, {cascade: true, onDelete: 'CASCADE'})
     @ApiProperty({ type: () => [Col], description: 'The columns associated with the project' })
     columns: Col[];
 

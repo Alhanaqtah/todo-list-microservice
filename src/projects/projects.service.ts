@@ -49,4 +49,8 @@ export class ProjectsService {
         const user = await this.projectRepo.findOne({where: {id}, relations: ['columns', 'columns.tasks']})
         return user;
     }
+
+    async handleRemoveUserData(id: string) {
+        await this.projectRepo.delete({user_id: id});
+    }
 }
